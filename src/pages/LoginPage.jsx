@@ -1,14 +1,17 @@
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Lock, Mail, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,6 +21,7 @@ export default function LoginPage() {
     try {
       await login(email, password);
     } catch (err) {
+      console.error('Login error:', err);
       const errorMessages = {
         'auth/invalid-credential': 'Credenciales incorrectas. Verifica tu email y contraseña.',
         'auth/user-not-found': 'No existe una cuenta con este email.',
