@@ -8,7 +8,7 @@ export default function ProtectedRoute({ children }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-gym-black flex flex-col items-center justify-center">
-        <img src={import.meta.env.BASE_URL + 'logo.png'} alt="7Strength" className="w-20 h-20 object-contain mb-6 opacity-50" />
+        <img src={import.meta.env.BASE_URL + 'logo2.png'} alt="7Strength" className="w-20 h-20 object-contain mb-6 opacity-50" />
         <Loader2 className="w-8 h-8 text-gym-metal animate-spin mb-4" />
         <p className="font-heading text-xl tracking-widest text-gym-metal">Cargando...</p>
       </div>

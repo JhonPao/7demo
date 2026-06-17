@@ -20,7 +20,7 @@ export default function AdminLayout() {
       <aside className="w-72 bg-gym-dark border-r border-gym-card flex flex-col relative z-10">
         {/* Logo */}
         <div className="h-28 flex flex-col items-center justify-center border-b border-gym-card">
-          <img src={import.meta.env.BASE_URL + 'logo.png'} alt="7Strength" className="w-14 h-14 object-contain mb-1" />
+          <img src={import.meta.env.BASE_URL + 'logo2.png'} alt="7Strength" className="w-14 h-14 object-contain mb-1" />
           <p className="font-heading text-sm tracking-[0.3em] text-gym-metal">ADMIN PANEL</p>
         </div>
 
@@ -80,7 +80,7 @@ export default function AdminLayout() {
 
         {/* Watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-          <img src={import.meta.env.BASE_URL + 'logo.png'} alt="" className="w-[500px] h-[500px] object-contain opacity-[0.03]" />
+          <img src={import.meta.env.BASE_URL + 'logo2.png'} alt="" className="w-[500px] h-[500px] object-contain opacity-[0.03]" />
         </div>
 
         {/* Content */}

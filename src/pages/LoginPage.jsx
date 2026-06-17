@@ -42,7 +42,7 @@ export default function LoginPage() {
       <div className="absolute inset-0">
         {/* Large watermark logo */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <img src={import.meta.env.BASE_URL + 'logo.png'} alt="" className="w-[800px] h-[800px] object-contain opacity-[0.03]" />
+          <img src={import.meta.env.BASE_URL + 'logo2.png'} alt="" className="w-[800px] h-[800px] object-contain opacity-[0.03]" />
         </div>
         {/* Gradient overlays */}
         <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-gym-metal/3 rounded-full blur-[200px] -translate-x-1/2 -translate-y-1/2" />
@@ -53,7 +53,7 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-10">
-          <img src={import.meta.env.BASE_URL + 'logo.png'} alt="7Strength" className="w-24 h-24 object-contain mx-auto mb-6" />
+          <img src={import.meta.env.BASE_URL + 'logo2.png'} alt="7Strength" className="w-24 h-24 object-contain mx-auto mb-6" />
           <h1 className="font-heading text-5xl tracking-[0.3em] text-gym-white">7STRENGTH</h1>
           <p className="font-heading text-xl tracking-[0.2em] text-gym-metal mt-2">ADMIN PANEL</p>
         </div>
