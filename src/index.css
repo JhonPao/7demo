@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gym-black: #000000;
+  --color-gym-dark: #0C0C0C;
+  --color-gym-card: #1A1A1A;
+  --color-gym-surface: #262626;
+  --color-gym-metal: #A0A0A0;
+  --color-gym-white: #FFFFFF;
+  --color-gym-accent: #FF3333;
+  --color-gym-green: #22C55E;
+  --color-gym-red: #EF4444;
+  --color-gym-yellow: #EAB308;
+
+  --font-heading: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-gym-black text-gym-white antialiased;
+    font-family: var(--font-body);
+  }
+}
