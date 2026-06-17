@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
-import { Users, DollarSign, TrendingUp, ShoppingCart, AlertTriangle, ArrowUpRight, ArrowDownRight, Package } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Users, DollarSign, TrendingUp, ShoppingCart, AlertTriangle, ArrowUpRight, ArrowDownRight, Loader2 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { generateMonthlyData, getTodayStats, getClientStats, getTopProducts } from '../data/mockData';
+import { getAllData } from '../data/firestoreService';
+import { processMonthlyData, getTodayStats, getClientStats, getTopProducts } from '../data/processData';
 import clsx from 'clsx';
 
 const CHART_COLORS = ['#A0A0A0', '#666666', '#444444', '#333333', '#222222'];
@@ -44,10 +45,29 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function DashboardPage() {
-  const monthlyData = useMemo(() => generateMonthlyData(), []);
-  const todayStats = useMemo(() => getTodayStats(), []);
-  const clientStats = useMemo(() => getClientStats(), []);
-  const topProducts = useMemo(() => getTopProducts(), []);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({ sales: [], expenses: [], clients: [], memberships: [], products: [], saleItems: [] });
+
+  useEffect(() => {
+    getAllData().then(result => {
+      setData(result);
+      setLoading(false);
+    });
+  }, []);
+
+  const monthlyData = processMonthlyData(data.sales, data.expenses);
+  const todayStats = getTodayStats(data.sales, data.expenses);
+  const clientStats = getClientStats(data.clients, data.memberships);
+  const topProducts = getTopProducts(data.saleItems, data.products);
+
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-gym-metal animate-spin mb-4" />
+        <p className="font-heading text-xl tracking-widest text-gym-metal">Cargando datos...</p>
+      </div>
+    );
+  }
 
   const last7Days = monthlyData.slice(-7);
   const thisMonthTotal = monthlyData.reduce((s, d) => s + d.totalIncome, 0);
@@ -69,7 +89,7 @@ export default function DashboardPage() {
         <StatCard icon={TrendingUp} label="Ingresos del Mes" value={`S/. ${thisMonthTotal.toFixed(0)}`}
           subtitle="Últimos 30 días" trend={8} trendUp={true} accentColor="text-gym-white" bgGlow="bg-gym-metal" />
         <StatCard icon={Users} label="Clientes Activos" value={clientStats.active}
-          subtitle={`${clientStats.newThisMonth} nuevos este mes`}
+          subtitle="Con membresía vigente"
           trend={5} trendUp={true} accentColor="text-blue-400" bgGlow="bg-blue-500" />
         <StatCard icon={ShoppingCart} label="Utilidad del Mes" value={`S/. ${thisMonthProfit.toFixed(0)}`}
           subtitle="Ingresos - Gastos" trend={thisMonthProfit > 0 ? 15 : -3} trendUp={thisMonthProfit > 0}

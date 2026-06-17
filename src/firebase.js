@@ -3,6 +3,7 @@
 // Ve a: Firebase Console > Tu proyecto > Configuración > General > Tus apps > Configuración del SDK
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAdPgVPYv_fGzqWjr5XTr1xDMlgn8Zt-t0",
@@ -16,4 +17,5 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const dbFirestore = getFirestore(app);
 export default app;

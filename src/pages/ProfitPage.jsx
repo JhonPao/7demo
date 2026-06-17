@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { generateMonthlyData, generateYearlyData } from '../data/mockData';
-import { DollarSign, TrendingUp, TrendingDown, ArrowUpRight } from 'lucide-react';
-import { useState } from 'react';
+import { getAllData } from '../data/firestoreService';
+import { processMonthlyData, processYearlyData } from '../data/processData';
+import { DollarSign, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -22,21 +22,40 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function ProfitPage() {
   const [view, setView] = useState('month');
-  const monthlyData = useMemo(() => generateMonthlyData(), []);
-  const yearlyData = useMemo(() => generateYearlyData(), []);
+  const [loading, setLoading] = useState(true);
+  const [allData, setAllData] = useState({ sales: [], expenses: [] });
 
-  const data = view === 'month' ? monthlyData : yearlyData;
+  useEffect(() => {
+    getAllData().then(result => {
+      setAllData(result);
+      setLoading(false);
+    });
+  }, []);
+
+  const monthlyData = processMonthlyData(allData.sales, allData.expenses);
+  const yearlyData = processYearlyData(allData.sales, allData.expenses);
+
+  const chartData = view === 'month' ? monthlyData : yearlyData;
   const xKey = view === 'month' ? 'label' : 'month';
 
-  const totalIncome = data.reduce((s, d) => s + d.totalIncome, 0);
-  const totalExpenses = data.reduce((s, d) => s + d.expenses, 0);
+  const totalIncome = chartData.reduce((s, d) => s + d.totalIncome, 0);
+  const totalExpenses = chartData.reduce((s, d) => s + d.expenses, 0);
   const totalProfit = totalIncome - totalExpenses;
   const profitMargin = totalIncome > 0 ? ((totalProfit / totalIncome) * 100).toFixed(1) : 0;
 
-  const profitData = data.map(d => ({
+  const profitData = chartData.map(d => ({
     ...d,
     profit: d.totalIncome - d.expenses,
   }));
+
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-gym-metal animate-spin mb-4" />
+        <p className="font-heading text-xl tracking-widest text-gym-metal">Cargando datos...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -113,7 +132,7 @@ export default function ProfitPage() {
         <h3 className="font-heading text-2xl tracking-widest text-gym-white mb-6">Ingresos vs Gastos</h3>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data}>
+            <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="profitGreen" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#22C55E" stopOpacity={0.2} />

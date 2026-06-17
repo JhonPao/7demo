@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { generateMonthlyData, generateYearlyData } from '../data/mockData';
-import { useState } from 'react';
+import { getAllData } from '../data/firestoreService';
+import { processMonthlyData, processYearlyData } from '../data/processData';
+import { Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -20,17 +21,36 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function IncomePage() {
-  const [view, setView] = useState('month'); // month, year
-  const monthlyData = useMemo(() => generateMonthlyData(), []);
-  const yearlyData = useMemo(() => generateYearlyData(), []);
+  const [view, setView] = useState('month');
+  const [loading, setLoading] = useState(true);
+  const [allData, setAllData] = useState({ sales: [], expenses: [] });
 
-  const data = view === 'month' ? monthlyData : yearlyData;
+  useEffect(() => {
+    getAllData().then(result => {
+      setAllData(result);
+      setLoading(false);
+    });
+  }, []);
+
+  const monthlyData = processMonthlyData(allData.sales, allData.expenses);
+  const yearlyData = processYearlyData(allData.sales, allData.expenses);
+
+  const chartData = view === 'month' ? monthlyData : yearlyData;
   const xKey = view === 'month' ? 'label' : 'month';
 
-  const totalIncome = data.reduce((s, d) => s + d.totalIncome, 0);
-  const totalMembership = data.reduce((s, d) => s + d.membershipIncome, 0);
-  const totalProducts = data.reduce((s, d) => s + d.productIncome, 0);
-  const totalExpenses = data.reduce((s, d) => s + d.expenses, 0);
+  const totalIncome = chartData.reduce((s, d) => s + d.totalIncome, 0);
+  const totalMembership = chartData.reduce((s, d) => s + d.membershipIncome, 0);
+  const totalProducts = chartData.reduce((s, d) => s + d.productIncome, 0);
+  const totalExpenses = chartData.reduce((s, d) => s + d.expenses, 0);
+
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-gym-metal animate-spin mb-4" />
+        <p className="font-heading text-xl tracking-widest text-gym-metal">Cargando datos...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -72,7 +92,7 @@ export default function IncomePage() {
         <h3 className="font-heading text-2xl tracking-widest text-gym-white mb-6">Desglose de Ingresos</h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} barGap={2}>
+            <BarChart data={chartData} barGap={2}>
               <XAxis dataKey={xKey} tick={{ fill: '#666', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#666', fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
@@ -89,7 +109,7 @@ export default function IncomePage() {
         <h3 className="font-heading text-2xl tracking-widest text-gym-white mb-6">Tendencia: Ingresos vs Gastos</h3>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data}>
+            <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="incGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#22C55E" stopOpacity={0.2} />

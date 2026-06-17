@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { generateYearlyData } from '../data/mockData';
-import { Trophy, TrendingUp, TrendingDown, Medal } from 'lucide-react';
+import { getAllData } from '../data/firestoreService';
+import { processYearlyData } from '../data/processData';
+import { Trophy, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -20,7 +21,26 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function RankingPage() {
-  const yearlyData = useMemo(() => generateYearlyData(), []);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({ sales: [], expenses: [] });
+
+  useEffect(() => {
+    getAllData().then(result => {
+      setData(result);
+      setLoading(false);
+    });
+  }, []);
+
+  const yearlyData = processYearlyData(data.sales, data.expenses);
+
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center">
+        <Loader2 className="w-10 h-10 text-gym-metal animate-spin mb-4" />
+        <p className="font-heading text-xl tracking-widest text-gym-metal">Cargando datos...</p>
+      </div>
+    );
+  }
 
   const ranked = [...yearlyData].sort((a, b) => b.totalIncome - a.totalIncome);
   const bestMonth = ranked[0];
