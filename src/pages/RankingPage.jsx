@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { getAllData } from '../data/firestoreService';
+import { useFirestoreData } from '../hooks/useFirestoreData';
 import { processYearlyData } from '../data/processData';
 import { Trophy, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
@@ -21,17 +20,10 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function RankingPage() {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState({ sales: [], expenses: [] });
+  const { data, loading } = useFirestoreData();
+  const safeData = data || { sales: [], expenses: [] };
 
-  useEffect(() => {
-    getAllData().then(result => {
-      setData(result);
-      setLoading(false);
-    });
-  }, []);
-
-  const yearlyData = processYearlyData(data.sales, data.expenses);
+  const yearlyData = processYearlyData(safeData.sales, safeData.expenses);
 
   if (loading) {
     return (
@@ -75,7 +67,7 @@ export default function RankingPage() {
             <TrendingUp className="w-8 h-8 text-gym-metal" />
             <span className="font-heading text-xl tracking-widest text-gym-metal">Promedio Mensual</span>
           </div>
-          <p className="font-heading text-5xl text-gym-white">S/. {avgIncome.toFixed(0).toLocaleString()}</p>
+          <p className="font-heading text-5xl text-gym-white">S/. {avgIncome.toFixed(2).toLocaleString()}</p>
           <p className="text-gym-metal text-sm mt-2">Basado en 12 meses</p>
         </div>
 

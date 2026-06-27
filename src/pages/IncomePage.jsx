@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { getAllData } from '../data/firestoreService';
+import { useFirestoreData } from '../hooks/useFirestoreData';
 import { processMonthlyData, processYearlyData } from '../data/processData';
 import { Loader2 } from 'lucide-react';
 import clsx from 'clsx';
@@ -22,15 +22,8 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function IncomePage() {
   const [view, setView] = useState('month');
-  const [loading, setLoading] = useState(true);
-  const [allData, setAllData] = useState({ sales: [], expenses: [] });
-
-  useEffect(() => {
-    getAllData().then(result => {
-      setAllData(result);
-      setLoading(false);
-    });
-  }, []);
+  const { data, loading } = useFirestoreData();
+  const allData = data || { sales: [], expenses: [] };
 
   const monthlyData = processMonthlyData(allData.sales, allData.expenses);
   const yearlyData = processYearlyData(allData.sales, allData.expenses);

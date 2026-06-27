@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Users, DollarSign, TrendingUp, ShoppingCart, AlertTriangle, ArrowUpRight, ArrowDownRight, Loader2 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { getAllData } from '../data/firestoreService';
+import { useFirestoreData } from '../hooks/useFirestoreData';
 import { processMonthlyData, getTodayStats, getClientStats, getTopProducts } from '../data/processData';
 import clsx from 'clsx';
 
@@ -45,20 +45,13 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function DashboardPage() {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState({ sales: [], expenses: [], clients: [], memberships: [], products: [], saleItems: [] });
+  const { data, loading } = useFirestoreData();
+  const safeData = data || { sales: [], expenses: [], clients: [], memberships: [], products: [], saleItems: [] };
 
-  useEffect(() => {
-    getAllData().then(result => {
-      setData(result);
-      setLoading(false);
-    });
-  }, []);
-
-  const monthlyData = processMonthlyData(data.sales, data.expenses);
-  const todayStats = getTodayStats(data.sales, data.expenses);
-  const clientStats = getClientStats(data.clients, data.memberships);
-  const topProducts = getTopProducts(data.saleItems, data.products);
+  const monthlyData = processMonthlyData(safeData.sales, safeData.expenses);
+  const todayStats = getTodayStats(safeData.sales, safeData.expenses);
+  const clientStats = getClientStats(safeData.clients, safeData.memberships);
+  const topProducts = getTopProducts(safeData.saleItems, safeData.products);
 
   if (loading) {
     return (
@@ -83,15 +76,15 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Top Stats */}
       <div className="grid grid-cols-4 gap-6">
-        <StatCard icon={DollarSign} label="Ingresos Hoy" value={`S/. ${todayStats.totalIncome.toFixed(0)}`}
+        <StatCard icon={DollarSign} label="Ingresos Hoy" value={`S/. ${todayStats.totalIncome.toFixed(2)}`}
           subtitle={`${todayStats.membershipSales} membresías · ${todayStats.productSales} productos`}
           trend={12} trendUp={true} accentColor="text-green-400" bgGlow="bg-green-500" />
-        <StatCard icon={TrendingUp} label="Ingresos del Mes" value={`S/. ${thisMonthTotal.toFixed(0)}`}
+        <StatCard icon={TrendingUp} label="Ingresos del Mes" value={`S/. ${thisMonthTotal.toFixed(2)}`}
           subtitle="Últimos 30 días" trend={8} trendUp={true} accentColor="text-gym-white" bgGlow="bg-gym-metal" />
         <StatCard icon={Users} label="Clientes Activos" value={clientStats.active}
           subtitle="Con membresía vigente"
           trend={5} trendUp={true} accentColor="text-blue-400" bgGlow="bg-blue-500" />
-        <StatCard icon={ShoppingCart} label="Utilidad del Mes" value={`S/. ${thisMonthProfit.toFixed(0)}`}
+        <StatCard icon={ShoppingCart} label="Utilidad del Mes" value={`S/. ${thisMonthProfit.toFixed(2)}`}
           subtitle="Ingresos - Gastos" trend={thisMonthProfit > 0 ? 15 : -3} trendUp={thisMonthProfit > 0}
           accentColor={thisMonthProfit > 0 ? "text-emerald-400" : "text-red-400"} bgGlow={thisMonthProfit > 0 ? "bg-emerald-500" : "bg-red-500"} />
       </div>

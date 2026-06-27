@@ -1,5 +1,5 @@
 import { dbFirestore } from '../firebase';
-import { collection, getDocs, query, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, Timestamp, onSnapshot } from 'firebase/firestore';
 
 function fromFirestore(snapshot) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -45,4 +45,14 @@ export async function getAllData() {
     getClients(), getMemberships(), getProducts(), getSales(), getSaleItems(), getExpenses(), getLeads(),
   ]);
   return { clients, memberships, products, sales, saleItems, expenses, leads };
+}
+
+export function subscribeAllData(callback) {
+  const collections = ['clients', 'memberships', 'products', 'sales', 'saleItems', 'expenses', 'leads'];
+  const unsubscribes = collections.map(name =>
+    onSnapshot(collection(dbFirestore, name), () => {
+      getAllData().then(callback);
+    })
+  );
+  return () => unsubscribes.forEach(u => u());
 }
