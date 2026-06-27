@@ -77,17 +77,19 @@ export function getClientStats(clients, memberships) {
 }
 
 export function getTopProducts(saleItems, products) {
-  const productCounts = {};
+  const productData = {};
   for (const item of saleItems) {
-    productCounts[item.productId] = (productCounts[item.productId] || 0) + (item.quantity || 0);
+    if (!productData[item.productId]) productData[item.productId] = { sold: 0, revenue: 0 };
+    productData[item.productId].sold += item.quantity || 0;
+    productData[item.productId].revenue += (item.quantity || 0) * (item.price || 0);
   }
-  const topIds = Object.entries(productCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  return topIds.map(([productId, sold]) => {
+  const topIds = Object.entries(productData).sort((a, b) => b[1].sold - a[1].sold).slice(0, 10);
+  return topIds.map(([productId, data]) => {
     const product = products.find(p => String(p.id) === String(productId));
     return {
       name: product?.name || 'Producto eliminado',
-      sold,
-      revenue: 0,
+      sold: data.sold,
+      revenue: data.revenue,
     };
   });
 }

@@ -181,7 +181,7 @@ export default function DashboardPage() {
                         style={{ width: `${(product.sold / maxSold) * 100}%` }} />
                     </div>
                   </div>
-                  <span className="font-heading text-lg text-gym-white shrink-0">S/. {product.revenue}</span>
+                  <span className="font-heading text-lg text-gym-white shrink-0">S/. {product.revenue.toFixed(2)}</span>
                 </div>
               );
             })}
