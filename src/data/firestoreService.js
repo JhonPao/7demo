@@ -1,5 +1,5 @@
 import { dbFirestore } from '../firebase';
-import { collection, getDocs, query, orderBy, limit, Timestamp, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, Timestamp, onSnapshot, doc } from 'firebase/firestore';
 
 function fromFirestore(snapshot) {
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -55,4 +55,10 @@ export function subscribeAllData(callback) {
     })
   );
   return () => unsubscribes.forEach(u => u());
+}
+
+export function subscribeReceptionStatus(callback) {
+  return onSnapshot(doc(dbFirestore, 'receptionStatus', 'current'), snapshot => {
+    callback(snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null);
+  });
 }

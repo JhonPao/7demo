@@ -7,6 +7,7 @@ import DashboardPage from './pages/DashboardPage';
 import IncomePage from './pages/IncomePage';
 import RankingPage from './pages/RankingPage';
 import ProfitPage from './pages/ProfitPage';
+import ReceptionPage from './pages/ReceptionPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="income" element={<IncomePage />} />
             <Route path="ranking" element={<RankingPage />} />
             <Route path="profit" element={<ProfitPage />} />
+            <Route path="reception" element={<ReceptionPage />} />
           </Route>
         </Routes>
       </HashRouter>

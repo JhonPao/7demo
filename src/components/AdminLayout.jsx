@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, TrendingUp, Trophy, DollarSign, LogOut } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, Trophy, DollarSign, Monitor, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import clsx from 'clsx';
 
@@ -8,6 +8,7 @@ const navItems = [
   { name: 'Ingresos', path: '/income', icon: TrendingUp },
   { name: 'Ranking', path: '/ranking', icon: Trophy },
   { name: 'Utilidad', path: '/profit', icon: DollarSign },
+  { name: 'Recepción', path: '/reception', icon: Monitor },
 ];
 
 export default function AdminLayout() {
