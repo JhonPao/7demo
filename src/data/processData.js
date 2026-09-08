@@ -26,10 +26,23 @@ export function processMonthlyData(sales, expenses, days = 30) {
 
 export function processYearlyData(sales, expenses) {
   const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const currentYear = new Date().getFullYear();
   return months.map((month, i) => {
     const monthStr = String(i + 1).padStart(2, '0');
-    const monthSales = sales.filter(s => s.date?.startsWith(`2026-${monthStr}`) || s.date?.startsWith(`2025-${monthStr}`));
-    const monthExpenses = expenses.filter(e => e.date?.startsWith(`2026-${monthStr}`) || e.date?.startsWith(`2025-${monthStr}`));
+    const monthSales = sales.filter(s => {
+      if (!s.date) return false;
+      const d = new Date(s.date);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      return (y === currentYear || y === currentYear - 1) && m === monthStr;
+    });
+    const monthExpenses = expenses.filter(e => {
+      if (!e.date) return false;
+      const d = new Date(e.date);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      return (y === currentYear || y === currentYear - 1) && m === monthStr;
+    });
     const membershipIncome = monthSales.filter(s => s.type === 'membership').reduce((sum, s) => sum + (s.total || 0), 0);
     const productIncome = monthSales.filter(s => s.type === 'product').reduce((sum, s) => sum + (s.total || 0), 0);
     const totalExpenses = monthExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
